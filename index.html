@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>PDF.js 'Hello, base64!' example</title>
+    <script src="wasm_exec.js"></script>
+    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <script>
+        const go = new Go();
+
+        if (!WebAssembly.instantiateStreaming) {
+            // polyfill
+            WebAssembly.instantiateStreaming = async (resp, importObject) => {
+                const source = await (await resp).arrayBuffer();
+                return await WebAssembly.instantiate(source, importObject);
+            };
+        }
+
+        let mod, inst;
+        WebAssembly.instantiateStreaming(fetch("pdf.wasm"), go.importObject).then(
+            async result => {
+                mod = result.module;
+                inst = result.instance;
+                await go.run(inst);
+            }
+        );
+
+        // Loaded via <script> tag, create shortcut to access PDF.js exports.
+        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+        // The workerSrc property shall be specified.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+        function renderBinary(pdfData, canvasId) {
+            // Using DocumentInitParameters object to load binary data.
+            var loadingTask = pdfjsLib.getDocument({data: pdfData});
+            loadingTask.promise.then(function(pdf) {
+                console.log('PDF loaded', pdf);
+
+                // Fetch the first page
+                var pageNumber = 1;
+                pdf.getPage(pageNumber).then(function(page) {
+                    console.log('Page loaded', page);
+
+                    var scale = 1;
+                    var viewport = page.getViewport({scale: scale});
+
+                    // Prepare canvas using PDF page dimensions
+                    var canvas = document.getElementById(canvasId || 'canvas');
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    // Render PDF page into canvas context
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    var renderTask = page.render(renderContext);
+
+                    renderTask.promise.then(function () {
+                        console.log('Page rendered');
+                    });
+                });
+            }, function (reason) {
+                // PDF loading error
+                console.error(reason);
+            });
+        }
+
+        function renderString(string) {
+            // generatePDF comes from wasm
+            renderBinary(atob(generatePDF(string)));
+        }
+
+    </script>
+    <style>
+        #canvas {
+            border: 1px solid black;
+            direction: ltr;
+        }
+    </style>
+</head>
+    <body>
+        <h1>PDF.js 'Hello, base64!' example</h1>
+        <canvas id="canvas"></canvas>
+        <br /><br />
+        <button onclick="renderString('Generated at ' + new Date().toISOString())">Generate new pdf</button>
+    </body>
+</html>
