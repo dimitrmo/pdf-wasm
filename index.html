@@ -30,40 +30,61 @@
         // The workerSrc property shall be specified.
         pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
 
-        function renderBinary(pdfData, canvasId) {
-            // Using DocumentInitParameters object to load binary data.
-            var loadingTask = pdfjsLib.getDocument({data: pdfData});
-            loadingTask.promise.then(function(pdf) {
-                console.log('PDF loaded', pdf);
+        // Reference for main doc
+        var pdfDoc;
 
-                // Fetch the first page
-                var pageNumber = 1;
-                pdf.getPage(pageNumber).then(function(page) {
-                    console.log('Page loaded', page);
+        // Rendered page number
+        var pageNumber = 1;
 
-                    var scale = 1;
-                    var viewport = page.getViewport({scale: scale});
+        // Total pdf pages
+        var totalPages = 0;
 
-                    // Prepare canvas using PDF page dimensions
-                    var canvas = document.getElementById(canvasId || 'canvas');
-                    var context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+        function renderPage(canvasId) {
+            pdfDoc.getPage(pageNumber).then(function(page) {
+                console.log(`Page ${pageNumber} loaded`, page);
 
-                    // Render PDF page into canvas context
-                    var renderContext = {
-                        canvasContext: context,
-                        viewport: viewport
-                    };
+                var scale = 1;
+                var viewport = page.getViewport({ scale: scale });
 
-                    var renderTask = page.render(renderContext);
+                // Prepare canvas using PDF page dimensions
+                var canvas = document.getElementById(canvasId || 'canvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
 
-                    renderTask.promise.then(function () {
-                        console.log('Page rendered');
-                    });
+                page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise.then(function () {
+                    console.log('page rendered', pageNumber, totalPages);
+                    document.getElementById('page_num').textContent = pageNumber;
+                    document.getElementById('page_count').textContent = totalPages;
                 });
+            });
+        }
+
+        function goPrev() {
+            if (!pdfDoc) return;
+            if (pageNumber - 1 <= 0) return;
+            pageNumber--;
+            renderPage();
+        }
+
+        function goNext() {
+            if (!pdfDoc) return;
+            if (pageNumber + 1 > totalPages) return;
+            pageNumber++;
+            renderPage();
+        }
+
+        function renderBinary(pdfData, canvasId) {
+            pdfjsLib.getDocument({ data: pdfData }).promise.then(function(pdf) {
+                console.log('pdf loaded', pdf);
+                pdfDoc = pdf;
+                totalPages = pdf.numPages;
+                pageNumber = 1;
+                renderPage(canvasId);
             }, function (reason) {
-                // PDF loading error
                 console.error(reason);
             });
         }
@@ -83,6 +104,13 @@
 </head>
     <body>
         <h1>PDF.js 'Hello, base64!' example</h1>
+        <div>
+            <button onclick="goPrev()">Previous</button>
+            <button onclick="goNext()">Next</button>
+            &nbsp; &nbsp;
+            <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+        </div>
+        <br />
         <canvas id="canvas"></canvas>
         <br /><br />
         <button onclick="renderString('Generated at ' + new Date().toISOString())">Generate new pdf</button>
