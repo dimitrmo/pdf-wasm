@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	GOOS=js GOARCH=wasm go build -a -tags netgo -ldflags "-s -w" -o pdf.wasm
+	GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o pdf.wasm
 	ls -lah pdf.wasm
 
 .PHONY: copy-js
