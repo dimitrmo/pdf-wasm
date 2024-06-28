@@ -12,5 +12,9 @@ copy-js:
 serve:
 	go run server.go
 
+.PHONY: docker
+docker:
+	docker build -t dimitrmo/pdf-wasm --output=. --target=wasm .
+
 .PHONY: run
 run: build copy-js serve
