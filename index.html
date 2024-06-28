@@ -25,30 +25,30 @@
         );
 
         // Loaded via <script> tag, create shortcut to access PDF.js exports.
-        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
 
         // The workerSrc property shall be specified.
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
 
-        // Reference for main doc
-        var pdfDoc;
+        // Reference for the main doc
+        let pdfDoc;
 
         // Rendered page number
-        var pageNumber = 1;
+        let pageNumber = 1;
 
         // Total pdf pages
-        var totalPages = 0;
+        let totalPages = 0;
 
         function renderPage(canvasId) {
             pdfDoc.getPage(pageNumber).then(function(page) {
                 console.log(`Page ${pageNumber} loaded`, page);
 
-                var scale = 1;
-                var viewport = page.getViewport({ scale: scale });
+                let scale = 1;
+                let viewport = page.getViewport({ scale: scale });
 
                 // Prepare canvas using PDF page dimensions
-                var canvas = document.getElementById(canvasId || 'canvas');
-                var context = canvas.getContext('2d');
+                const canvas = document.getElementById(canvasId || 'canvas');
+                const context = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
 
