@@ -22,6 +22,10 @@
         .preview {
             display: none;
         }
+
+        .prev {
+            disabled: true;
+        }
     </style>
     <script>
         const go = new Go();
@@ -78,6 +82,8 @@
                     console.log('page rendered', pageNumber, totalPages);
                     document.getElementById('page_num').textContent = pageNumber;
                     document.getElementById('page_count').textContent = totalPages;
+                    document.getElementsByClassName("prev")[0].disabled = false;
+                    document.getElementsByClassName("next")[0].disabled = false;
                 });
             });
         }
@@ -136,8 +142,8 @@
             <div class="loader"></div>
             <div class="preview">
                 <div>
-                    <button onclick="goPrev()">Previous</button>
-                    <button onclick="goNext()">Next</button>                &nbsp; &nbsp;
+                    <button disabled class="prev" onclick="goPrev()">Previous</button>
+                    <button disabled class="next" onclick="goNext()">Next</button>                &nbsp; &nbsp;
                     <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
                 </div>
                 <br />
