@@ -5,8 +5,12 @@ build:
 
 .PHONY: copy-js
 copy-js:
-	cp "$(GOROOT)/misc/wasm/wasm_exec.js" .
+	rm -f wasm_exec.js
+	wget https://raw.githubusercontent.com/golang/go/master/misc/wasm/wasm_exec.js
 
 .PHONY: serve
 serve:
 	go run server.go
+
+.PHONY: run
+run: build copy-js serve

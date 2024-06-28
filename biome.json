@@ -1,0 +1,7 @@
+{
+    "files": {
+        "ignore": [
+            "wasm_exec.js"
+        ]
+    }
+}
