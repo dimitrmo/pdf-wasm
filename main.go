@@ -4,12 +4,13 @@ import (
 	_ "embed"
 	"encoding/base64"
 	"fmt"
-	"github.com/signintech/gopdf"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
 	"syscall/js"
+
+	"github.com/signintech/gopdf"
 )
 
 //go:embed "font.ttf"
