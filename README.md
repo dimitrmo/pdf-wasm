@@ -6,7 +6,11 @@
 ## Demo
 [Live example](https://dimitrmo.github.io/pdf-wasm/)
 
-## Techstack
+## Libraries
 
-* Golang >= 1.16
-* Latest Mozilla PDF.js
+* Golang >= 1.22
+* Mozilla PDF.js @ 2.6.347
+
+## References
+
+* https://docs.docker.com/build/guide/export/
