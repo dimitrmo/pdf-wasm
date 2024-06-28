@@ -4,6 +4,25 @@
     <title>PDF.js 'Hello, base64!' example</title>
     <script src="wasm_exec.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3; /* Light grey */
+            border-top: 16px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .preview {
+            display: none;
+        }
+    </style>
     <script>
         const go = new Go();
 
@@ -94,6 +113,15 @@
             renderBinary(atob(generatePDF(string)));
         }
 
+        // global callback from wasm
+        function onAssetsDownloadStatus(status) {
+            console.log('Status for assets download changed:', status);
+            if (status === 'finish') {
+                document.getElementsByClassName("loader")[0].style.display = 'none';
+                document.getElementsByClassName("preview")[0].style.display = 'block';
+            }
+        }
+
     </script>
     <style>
         #canvas {
@@ -104,15 +132,19 @@
 </head>
     <body>
         <h1>PDF.js 'Hello, base64!' example</h1>
-        <div>
-            <button onclick="goPrev()">Previous</button>
-            <button onclick="goNext()">Next</button>
-            &nbsp; &nbsp;
-            <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+        <div class="content">
+            <div class="loader"></div>
+            <div class="preview">
+                <div>
+                    <button onclick="goPrev()">Previous</button>
+                    <button onclick="goNext()">Next</button>                &nbsp; &nbsp;
+                    <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+                </div>
+                <br />
+                <canvas id="canvas"></canvas>
+                <br /><br />
+                <button class="generate" onclick="renderString('Generated at ' + new Date().toISOString())">Generate new pdf</button>
+            </div>
         </div>
-        <br />
-        <canvas id="canvas"></canvas>
-        <br /><br />
-        <button onclick="renderString('Generated at ' + new Date().toISOString())">Generate new pdf</button>
     </body>
 </html>

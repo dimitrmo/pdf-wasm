@@ -55,6 +55,8 @@ func downloadFlag(country, flag string) {
 // generatePDF
 func generatePDF() js.Func {
 	var wg sync.WaitGroup
+	callback := js.Global().Get("onAssetsDownloadStatus")
+	callback.Invoke("start")
 
 	for country, flag := range flags {
 		wg.Add(1)
@@ -66,6 +68,7 @@ func generatePDF() js.Func {
 
 	wg.Wait()
 
+    callback.Invoke("finish")
 	fmt.Print("All flags downloaded\n")
 
 	return js.FuncOf(func(this js.Value, args []js.Value) interface{} {
