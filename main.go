@@ -68,7 +68,7 @@ func generatePDF() js.Func {
 
 	wg.Wait()
 
-    callback.Invoke("finish")
+    	callback.Invoke("finish")
 	fmt.Print("All flags downloaded\n")
 
 	return js.FuncOf(func(this js.Value, args []js.Value) interface{} {
